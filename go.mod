@@ -1,4 +1,4 @@
-module github.com/hookenz/template
+module github.com/hookenz/fresh-start
 
 go 1.22.0
 

@@ -7,13 +7,13 @@ ARCH=$(shell go env GOARCH)
 GOTESTSUM=go run gotest.tools/gotestsum@v1.10.0
 
 .DEFAULT_GOAL := help
-.PHONY: server frontend frontend-dev
+.PHONY: server frontend frontend-dev 
 
 ##@ Building
 
 server: ## Build the server
 	@echo "Building the Server API ..."
-	@CGO_ENABLED=0 GOOS=$(PLATFORM) GOARCH=$(ARCH) go build -trimpath --installsuffix cgo --ldflags "-s" -o dist/$(server) main.go
+	CGO_ENABLED=0 GOOS=$(PLATFORM) GOARCH=$(ARCH) go build -trimpath --installsuffix cgo --ldflags "-s" -o dist/$@ .
 
 frontend: 
 	cd frontend && yarn build
