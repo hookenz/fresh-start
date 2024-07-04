@@ -13,13 +13,14 @@ GOTESTSUM=go run gotest.tools/gotestsum@v1.10.0
 
 server: ## Build the server
 	@echo "Building the Server API ..."
-	CGO_ENABLED=0 GOOS=$(PLATFORM) GOARCH=$(ARCH) go build -trimpath --installsuffix cgo --ldflags "-s" -o dist/$@ .
+	go generate ./...
+	GOOS=$(PLATFORM) GOARCH=$(ARCH) go build -trimpath --installsuffix cgo --ldflags "-s" -o dist/$@ .
 
-frontend: 
+frontend: ## Build the frontend
 	cd frontend && yarn build
 
-frontend-dev:
-	yarn dev
+frontend-dev: ## Build and serve the frontend in development mode
+	cd frontend && yarn dev
 
 ##@ Dependencies
 

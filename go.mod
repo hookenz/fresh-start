@@ -1,6 +1,6 @@
-module github.com/hookenz/fresh-start
+module github.com/hookenz/moneygo
 
-go 1.22.0
+go 1.22.5
 
 require (
 	github.com/labstack/echo/v4 v4.12.0
