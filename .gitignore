@@ -1,5 +1,7 @@
 dist
 
+*_templ.go
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
