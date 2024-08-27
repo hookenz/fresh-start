@@ -6,6 +6,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+//
+// TODO: https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
+//
+
 type User struct {
 	Username string
 	Password string
