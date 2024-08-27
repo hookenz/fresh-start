@@ -1,10 +1,10 @@
 package main
 
 import (
+	"embed"
 	"os"
 
-	"embed"
-
+	"github.com/hookenz/moneygo/api/db"
 	"github.com/hookenz/moneygo/api/server"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -12,12 +12,17 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-//go:embed dist/public*
-var frontend embed.FS
+//go:embed assets
+var assets embed.FS
 
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
-	s := server.New(":8080", frontend)
+	err := db.Open()
+	if err != nil {
+		log.Fatal().Err(err).Send()
+	}
+
+	s := server.New(":9000", assets)
 	s.Start()
 }

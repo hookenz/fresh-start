@@ -11,12 +11,12 @@ type User struct {
 	Password string
 }
 
-func Login(c echo.Context) error {
+func Authenticate(c echo.Context) error {
 	var user User
 	err := c.Bind(&user)
 	if err != nil {
 		return c.String(http.StatusBadRequest, "bad request")
 	}
 
-	return nil
+	return c.Redirect(200, "/")
 }

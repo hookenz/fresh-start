@@ -6,21 +6,16 @@ ARCH=$(shell go env GOARCH)
 
 GOTESTSUM=go run gotest.tools/gotestsum@v1.10.0
 
-.DEFAULT_GOAL := help
-.PHONY: server frontend frontend-dev 
+.DEFAULT_GOAL := server
+.PHONY: server
 
 ##@ Building
 
 server: ## Build the server
-	@echo "Building the Server API ..."
+	@echo "Building the Server API ..."	
+	templ generate
 	go generate ./...
 	GOOS=$(PLATFORM) GOARCH=$(ARCH) go build -trimpath --installsuffix cgo --ldflags "-s" -o dist/$@ .
-
-frontend: ## Build the frontend
-	cd frontend && yarn build
-
-frontend-dev: ## Build and serve the frontend in development mode
-	cd frontend && yarn dev
 
 ##@ Dependencies
 
@@ -32,6 +27,11 @@ tidy: ## Tidy up the go.mod file
 
 test:	## Run server tests
 	$(GOTESTSUM) --format pkgname-and-test-fails --format-hide-empty-pkg --hide-summary skipped -- -cover  ./...
+
+##@ Run
+.PHONY: run
+run: 
+	go run main.go
 
 ##@ Cleanup
 
