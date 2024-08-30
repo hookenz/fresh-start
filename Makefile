@@ -31,7 +31,7 @@ test:	## Run server tests
 ##@ Run
 .PHONY: run
 run: 
-	go run main.go
+	SESSION_KEY="testkey" go run main.go
 
 ##@ Cleanup
 

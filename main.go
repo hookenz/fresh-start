@@ -18,11 +18,13 @@ var assets embed.FS
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
-	err := db.Open()
+	store := db.NewSqliteStore("database.db")
+
+	err := store.Open()
 	if err != nil {
 		log.Fatal().Err(err).Send()
 	}
 
-	s := server.New(":9000", assets)
+	s := server.New(":9000", store, assets)
 	s.Start()
 }

@@ -1,30 +1,18 @@
 package db
 
 import (
-	"database/sql"
-	"fmt"
-
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/gorilla/sessions"
 )
 
-const filename string = "moneygo.db"
+type Database interface {
+	Open() error
 
-func Open() error {
-	var err error
-	db, err := sql.Open("sqlite3", filename)
-	if err != nil {
-		return fmt.Errorf("error opening database: %w", err)
-	}
-
-	err = CreateTables(db)
-	if err != nil {
-		return fmt.Errorf("error creating database: %w", err)
-	}
-
-	return nil
+	SelectUser(name string) (UserRecord, error)
+	SessionStore() sessions.Store
 }
 
-func CreateTables(db *sql.DB) error {
-	err := CreateUser(db)
-	return err
+type UserRecord struct {
+	ID       string
+	Name     string
+	Password string
 }

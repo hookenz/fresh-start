@@ -1,8 +1,13 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/hookenz/moneygo/api/db"
+	u "github.com/hookenz/moneygo/api/services/user"
+
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
@@ -15,12 +20,21 @@ type User struct {
 	Password string
 }
 
-func Authenticate(c echo.Context) error {
+func Authenticate(c echo.Context, db db.Database) error {
 	var user User
 	err := c.Bind(&user)
 	if err != nil {
 		return c.String(http.StatusBadRequest, "bad request")
 	}
+
+	sess, err := session.Get("id", c)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("id: %v\n", sess)
+
+	u.Authenticate(db, user.Username, user.Password)
 
 	return c.Redirect(200, "/")
 }

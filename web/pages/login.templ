@@ -1,13 +1,16 @@
 package pages 
 
+import "github.com/hookenz/moneygo/web/deps"
+
 templ Login() {
-	<html>
-		// <head>
-		// 	<meta charset="UTF-8"/>
-		// 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		// 	@deps.HTMX()
-		// 	<title>MoneyGO</title>
-		// </head>
+	<!DOCTYPE html>
+	<html lang="en-US">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			@deps.HTMX()
+			<title>MoneyGO</title>
+		</head>
 		<div>
 			<h2>Sign in</h2>
 			<form hx-post="/api/authenticate" hx-target="#page" hx-swap="innerHTML">
