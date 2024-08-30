@@ -2,7 +2,6 @@ package user
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/alexedwards/argon2id"
 	"github.com/hookenz/moneygo/api/db"
@@ -27,7 +26,7 @@ func Authenticate(db db.Database, username, password string) (UserView, error) {
 
 	match, err := argon2id.ComparePasswordAndHash(record.Password, hash)
 	if err != nil {
-		log.Fatal(err)
+		return user, fmt.Errorf("authentication failure")
 	}
 
 	if !match {

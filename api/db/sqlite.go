@@ -3,7 +3,6 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/gorilla/sessions"
@@ -82,8 +81,7 @@ func (s *SqliteStore) createSessionStore() error {
 	var err error
 
 	if s.db == nil {
-		// this would only happen if we call this function before the store is open. We shouldn't do that.
-		log.Fatal("db not open")
+		return fmt.Errorf("error creating session store, database not open")
 	}
 
 	s.sessionStore, err = sqlitestore.NewSqliteStoreFromConnection(s.db, "sessions", "/", maxAge, []byte(os.Getenv("SESSION_KEY")))

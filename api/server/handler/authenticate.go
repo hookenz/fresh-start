@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/hookenz/moneygo/api/db"
+	"github.com/gorilla/sessions"
 	u "github.com/hookenz/moneygo/api/services/user"
 
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 )
 
 //
@@ -20,7 +21,7 @@ type User struct {
 	Password string
 }
 
-func Authenticate(c echo.Context, db db.Database) error {
+func (h *Handler) Authenticate(c echo.Context) error {
 	var user User
 	err := c.Bind(&user)
 	if err != nil {
@@ -34,7 +35,21 @@ func Authenticate(c echo.Context, db db.Database) error {
 
 	fmt.Printf("id: %v\n", sess)
 
-	u.Authenticate(db, user.Username, user.Password)
+	u, err := u.Authenticate(h.db, user.Username, user.Password)
+	if err != nil {
+		return err
+	}
+
+	log.Debug().Msgf("User authenticated %v", u.Name)
+
+	sess.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   86400 * 7,
+		HttpOnly: true,
+	}
+	if err := sess.Save(c.Request(), c.Response()); err != nil {
+		return err
+	}
 
 	return c.Redirect(200, "/")
 }
