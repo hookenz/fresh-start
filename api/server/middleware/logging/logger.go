@@ -32,7 +32,7 @@ func NewLogger() MoneyLogger {
 		return fmt.Sprintf("%s: ", i)
 	}
 
-	zerolog := zerolog.New(output).With().Caller().Timestamp().Logger()
+	zerolog := zerolog.New(output).With().Timestamp().Logger()
 	Logger = MoneyLogger{zerolog}
 	return Logger
 }

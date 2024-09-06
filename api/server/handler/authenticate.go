@@ -1,13 +1,10 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/gorilla/sessions"
 	u "github.com/hookenz/moneygo/api/services/user"
 
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 )
@@ -17,23 +14,23 @@ import (
 //
 
 type User struct {
-	Username string
-	Password string
+	Username string `query:"username" json:"username"`
+	Password string `query:"password" json:"password"`
 }
 
 func (h *Handler) Authenticate(c echo.Context) error {
 	var user User
-	err := c.Bind(&user)
-	if err != nil {
-		return c.String(http.StatusBadRequest, "bad request")
-	}
 
-	sess, err := session.Get("id", c)
-	if err != nil {
-		return err
-	}
+	user.Username = c.FormValue("username")
+	user.Password = c.FormValue("password")
 
-	fmt.Printf("id: %v\n", sess)
+	// Bind seems to be very problematic! might come back to it
+	// err := c.Bind(&user)
+	// if err != nil {
+	// 	return c.String(http.StatusBadRequest, "bad request")
+	// }
+
+	log.Debug().Msgf("user.name=%s, user.password=%s", user.Username, user.Password)
 
 	u, err := u.Authenticate(h.db, user.Username, user.Password)
 	if err != nil {
@@ -42,14 +39,35 @@ func (h *Handler) Authenticate(c echo.Context) error {
 
 	log.Debug().Msgf("User authenticated %v", u.Name)
 
-	sess.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   86400 * 7,
-		HttpOnly: true,
-	}
-	if err := sess.Save(c.Request(), c.Response()); err != nil {
+	// Generate an id
+	id, err := h.db.CreateSession()
+	if err != nil {
 		return err
 	}
 
-	return c.Redirect(200, "/")
+	// Create a session cookie
+	writeSessionCookie(c, id)
+	return c.Redirect(302, "/home")
+}
+
+func (h *Handler) Logout(c echo.Context) error {
+	var user User
+	err := c.Bind(&user)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+
+	return c.Redirect(302, "/")
+}
+
+func writeSessionCookie(c echo.Context, sessionid string) {
+	log.Debug().Msg("Set Session Cookie")
+	cookie := new(http.Cookie)
+	cookie.Name = "id"
+	cookie.Value = sessionid
+	cookie.Path = "/"
+	cookie.MaxAge = 24 * 60 * 60
+	cookie.HttpOnly = true
+	cookie.SameSite = http.SameSiteStrictMode
+	c.SetCookie(cookie)
 }

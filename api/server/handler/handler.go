@@ -1,6 +1,8 @@
 package handler
 
-import "github.com/hookenz/moneygo/api/db"
+import (
+	"github.com/hookenz/moneygo/api/db"
+)
 
 type Handler struct {
 	db db.Database

@@ -2,18 +2,16 @@ package server
 
 import (
 	"embed"
-	"fmt"
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/gorilla/sessions"
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/rs/zerolog/log"
+	"golang.org/x/time/rate"
 
 	"github.com/hookenz/moneygo/api/db"
 	"github.com/hookenz/moneygo/api/server/handler"
+	"github.com/hookenz/moneygo/api/server/middleware/cookieauth"
 	"github.com/hookenz/moneygo/api/server/middleware/logging"
 	"github.com/hookenz/moneygo/web/pages"
 )
@@ -43,48 +41,22 @@ func New(address string, db db.Database, staticfs embed.FS) *Server {
 
 func (s *Server) setupMiddleware() {
 	logging.NewLogger()
-	s.e.Use(logging.LoggingMiddleware)
+	s.e.Use(logging.Middleware)
 	s.e.Use(middleware.Recover())
-	s.e.Use(session.Middleware(s.db.SessionStore()))
+	s.e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
 }
 
 func (s *Server) setupHandlers() {
 	s.e.GET("/", IndexHandler)
 	s.e.GET("/login", LoginHandler)
-	s.e.GET("/home", HomeHandler)
 
-	api := s.e.Group("/api")
+	api := handler.NewHandler(s.db)
+	s.e.POST("/api/auth", api.Authenticate)
+	s.e.POST("/api/logout", api.Logout)
 
-	h := handler.NewHandler(s.db)
-	api.POST("/authenticate", h.Authenticate)
-
-	s.e.GET("/create-session", func(c echo.Context) error {
-		sess, err := session.Get("id", c)
-		if err != nil {
-			return err
-		}
-
-		log.Debug().Msgf("CreateSession")
-
-		sess.Options = &sessions.Options{
-			Path:     "/",
-			MaxAge:   86400 * 7,
-			HttpOnly: true,
-		}
-		sess.Values["foo"] = "bar"
-		if err := sess.Save(c.Request(), c.Response()); err != nil {
-			return err
-		}
-		return c.NoContent(http.StatusOK)
-	})
-
-	s.e.GET("/read-session", func(c echo.Context) error {
-		sess, err := session.Get("id", c)
-		if err != nil {
-			return err
-		}
-		return c.String(http.StatusOK, fmt.Sprintf("foo=%v\n", sess.Values["foo"]))
-	})
+	// authenticated routes follow
+	authenticated := s.e.Group("", cookieauth.Middleware(s.db))
+	authenticated.GET("/home", HomeHandler)
 }
 
 func IndexHandler(c echo.Context) error {

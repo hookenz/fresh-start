@@ -3,8 +3,8 @@ package user
 import (
 	"fmt"
 
-	"github.com/alexedwards/argon2id"
 	"github.com/hookenz/moneygo/api/db"
+	"github.com/hookenz/moneygo/api/utils/hash"
 )
 
 type UserView struct {
@@ -19,12 +19,7 @@ func Authenticate(db db.Database, username, password string) (UserView, error) {
 		return user, err
 	}
 
-	hash, err := argon2id.CreateHash(password, argon2id.DefaultParams)
-	if err != nil {
-		return user, err
-	}
-
-	match, err := argon2id.ComparePasswordAndHash(record.Password, hash)
+	match, err := hash.Compare(password, record.Password)
 	if err != nil {
 		return user, fmt.Errorf("authentication failure")
 	}
@@ -32,8 +27,6 @@ func Authenticate(db db.Database, username, password string) (UserView, error) {
 	if !match {
 		return user, fmt.Errorf("authentication failure")
 	}
-
-	// Create a session
 
 	return user, nil
 }

@@ -5,15 +5,20 @@ go 1.23.0
 require (
 	github.com/a-h/templ v0.2.771
 	github.com/alexedwards/argon2id v1.0.0
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/sessions v1.4.0
+	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo-contrib v0.17.1
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/michaeljs1990/sqlitestore v0.0.0-20210507162135-8585425bc864
 	github.com/rs/zerolog v1.33.0
+	golang.org/x/term v0.23.0
+	golang.org/x/time v0.5.0
 )
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/gorilla/context v1.1.2 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
@@ -26,5 +31,4 @@ require (
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sys v0.23.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
-	golang.org/x/time v0.5.0 // indirect
 )
