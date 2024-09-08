@@ -41,9 +41,9 @@ func Middleware(db db.Database) echo.MiddlewareFunc {
 
 func readSessionCookie(c echo.Context) (string, error) {
 	cookie, err := c.Cookie("id")
-	log.Debug().Msgf("Cookie %v\n", cookie)
 	if err != nil {
 		return "", err
 	}
+
 	return cookie.Value, nil
 }

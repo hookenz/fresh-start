@@ -14,21 +14,17 @@ import (
 //
 
 type User struct {
-	Username string `query:"username" json:"username"`
-	Password string `query:"password" json:"password"`
+	Username string `form:"username"`
+	Password string `form:"password"`
 }
 
 func (h *Handler) Authenticate(c echo.Context) error {
 	var user User
 
-	user.Username = c.FormValue("username")
-	user.Password = c.FormValue("password")
-
-	// Bind seems to be very problematic! might come back to it
-	// err := c.Bind(&user)
-	// if err != nil {
-	// 	return c.String(http.StatusBadRequest, "bad request")
-	// }
+	err := c.Bind(&user)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
 
 	log.Debug().Msgf("user.name=%s, user.password=%s", user.Username, user.Password)
 
